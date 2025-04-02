@@ -1,0 +1,24 @@
+@with_kw struct wire_system
+    wire::Params
+    calc_params = Calc_Params()
+end
+
+wires = Dict(
+    "dev_1" => Params(;
+        a0 = 2,
+        R = 70,
+        w = 48,
+        d = 7,
+        Δ0 = 0.2,
+        ξd = 90,
+        τΓ = 22,
+        α = 0,
+        preα = 0,
+        μ = 35,
+        g = 0
+    )
+)
+
+wire_systems = Dict(
+    key => wire_system(; wire) for (key, wire) in wires
+)
