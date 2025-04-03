@@ -171,7 +171,7 @@ version = "0.1.2"
 
 [[deps.FullShell]]
 deps = ["Parameters", "Quantica", "Roots"]
-git-tree-sha1 = "4155025332c29d374db7ded5de1ce6c89ded2efb"
+git-tree-sha1 = "9541acebb2b3c9ede10a715f0c2ea6ad8d03f31b"
 repo-rev = "main"
 repo-url = "git@github.com:CarlosP24/FullShell.jl.git"
 uuid = "7d6ffa35-d0d1-47cf-a89d-5cba1c019934"
@@ -447,9 +447,9 @@ version = "1.11.0"
 
 [[deps.SlurmClusterManager]]
 deps = ["Distributed"]
-git-tree-sha1 = "82273a8cf6beab2043a0fcfe00884bc68fafc817"
+git-tree-sha1 = "0689bbb1a914b979cf01419c7d8b553425ba18e9"
 uuid = "c82cd089-7bf7-41d7-976b-6b5d413cbe0a"
-version = "1.0.0"
+version = "1.1.0"
 
 [[deps.Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"

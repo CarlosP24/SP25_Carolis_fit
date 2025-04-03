@@ -25,6 +25,8 @@ function build_SC(wire::Params, L::Float64)
         ΣS = FullShell.ΣS3DUsadel
     elseif shell == "Ballistic"
         ΣS = FullShell.ΣS3DBallistic
+    elseif shell == "Usadel_old" 
+        ΣS = FullShell.ΣS3DUsadel_old
     else
         ΣS = FullShell.ΣΔ
     end

@@ -5,30 +5,42 @@ using CairoMakie, Parameters, JLD2, Quantica, FullShell
 
 ##
 
-function plot_LDOS(pos, name::String; basename = "LDOS", colorrange = (0, 2e-2))
+function plot_LDOS(pos, name::String; basename = "LDOS", colorrange = (0, 2e-2), vlines = [0, 1, 2])
     res = load("data/$(basename)/$(name).jld2", "res")
     @unpack wire, LDOS, params = res
     @unpack Brng, ωrng = params
 
     ax = Axis(pos; xlabel = "B (T)", ylabel = "ω (meV)")
 
-    ωrng = vcat(real(ωrng), - reverse(real(ωrng))[2:end])
-    LDOS = LDOS |> values |> sum
-    LDOS = hcat(LDOS, reverse(LDOS, dims = 2)[:, 2:end])
+    #ωrng = vcat(real(ωrng), - reverse(real(ωrng))[2:end])
+    ωrng = ωrng |> real
+    LDOS = LDOS |> values |> sum .|> abs
+    #LDOS = hcat(LDOS, reverse(LDOS, dims = 2)[:, 2:end])
     heatmap!(ax, Brng, ωrng, LDOS; colormap = :thermal, colorrange)
+    ΦtoB = get_B(wire)
+    vlines!(ax, ΦtoB.(vlines); color = :white, linestyle = :dash)
+
     return ax 
 end
 
-function plot_conductance(pos, name::String; basename = "Conductance", colorrange = (0, 1))
+function plot_conductance(pos, name::String; basename = "Conductance", colorrange = (0, 1), vlines = [1, 2])
     res = load("data/$(basename)/$(name).jld2", "res")
-    @unpack wire, G, params = res
+    @unpack wire, G, params, barrier = res
     @unpack Brng, ωrng = params
     ax = Axis(pos; xlabel = L"$B$ (T)", ylabel = L"$ω$ (meV)")
 
-    ωrng = vcat(real(ωrng), - reverse(real(ωrng))[2:end])
-    G = G |> values |> sum
-    G = hcat(G, reverse(G, dims = 2)[:, 2:end])
+    #ωrng = vcat(real(ωrng), - reverse(real(ωrng))[2:end])
+    ωrng = ωrng |> real
+    G = G |> values |> sum .|> abs
+    #G = hcat(G, reverse(G, dims = 2)[:, 2:end])
     heatmap!(ax, Brng, ωrng, G; colormap = :thermal, colorrange)
+
+    ΦtoB = get_B(wire)
+    vlines!(ax, ΦtoB.(vlines); color = :white, linestyle = :dash)
+    text!(ax, 0, 0.02; text = L"$V_B = %$(barrier.VB)$meV", color = :white, fontsize = 12, align = (:center, :center))
+    text!(ax, 0, -0.02; text = L"$L_B = %$(barrier.LB)$nm", color = :white, fontsize = 12, align = (:center, :center))
+
+
     return ax 
 end
 
@@ -52,9 +64,10 @@ function plot_linecut(pos, name::String, basename::String; Φs = [0, 1, 2], ylab
     print(Bs)
     Bis = map(B ->find_B(B, Brng), Bs)
 
-    ωrng = vcat(real(ωrng), - reverse(real(ωrng))[2:end])
-    data = data |> values |> sum
-    data = hcat(data, reverse(data, dims = 2)[:, 2:end])
+    #ωrng = vcat(real(ωrng), - reverse(real(ωrng))[2:end])
+    ωrng = ωrng |> real
+    data = data |> values |> sum .|> abs
+    #data = hcat(data, reverse(data, dims = 2)[:, 2:end])
 
     ax = Axis(pos; xlabel = "ω (meV)", ylabel)
 
@@ -62,16 +75,17 @@ function plot_linecut(pos, name::String, basename::String; Φs = [0, 1, 2], ylab
         lines!(ax, ωrng, data[Bi, :], label = L"$\Phi = %$(Φs[i]) \Phi_0$")
     end
 
-    axislegend(ax, position = (0.5,1), framevisible = false)
+    axislegend(ax, position = (0.3,1), framevisible = false)
     return ax
 end
 
 function plot_proposal()
-    fig = Figure(size = (600, 800))
+    fig = Figure(size = (600, 800)) 
     ax = plot_LDOS(fig[1, 1], "dev_1")
     hidexdecorations!(ax, ticks = false)
     Colorbar(fig[1, 2], colormap = :thermal, limits = (0, 1), ticks = [0, 1], label = L"$$LDOS (arb. units)", labelpadding = -10)
     ax = plot_conductance(fig[2, 1], "sys_1"; colorrange = (0, 0.5))
+    hlines!(ax, 0; color = :white, linestyle = :dash)
     Colorbar(fig[2, 2], colormap = :thermal, limits = (0, 0.5), ticks = [0, 0.4], label = L"$G$ $(e^2/h)$", labelpadding = -20)
 
     fig_cuts = fig[3, 1:2] = GridLayout()
@@ -79,10 +93,12 @@ function plot_proposal()
     ax = plot_linecut(fig_cuts[1, 1], "dev_1", "LDOS"; Φs = [0, 1, 2])
     ax = plot_linecut(fig_cuts[1, 2], "sys_1", "Conductance"; Φs = [0, 1, 2], ylabel = L"G (e^2/h)")
 
+    Label(fig_cuts[1, 1, Top()], "LDOS")
+    Label(fig_cuts[1, 2, Top()], "Conductance")
     rowgap!(fig.layout, 1, 5)
     rowgap!(fig.layout, 2, 5)
     colgap!(fig.layout, 1, 5)
     return fig 
 end
-o
+
 fig = plot_proposal()

@@ -15,7 +15,9 @@ wires = Dict(
         α = 0,
         preα = 0,
         μ = 35,
-        g = 0
+        g = 0,
+        shell = "Usadel_old",
+        Zs = -6:6
     )
 )
 
