@@ -8,8 +8,8 @@ systems = Dict(
     "sys_1" => System(;
         wire = wires["dev_1"],
         barrier_params = Barrier_params(;
-            LB = 56,
-            VB = 90
+            LB = 60,
+            VB = 70
         )
     )
 )

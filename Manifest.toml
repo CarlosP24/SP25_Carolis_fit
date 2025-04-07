@@ -113,9 +113,9 @@ version = "1.9.1"
 
 [[deps.Dictionaries]]
 deps = ["Indexing", "Random", "Serialization"]
-git-tree-sha1 = "1cdab237b6e0d0960d5dcbd2c0ebfa15fa6573d9"
+git-tree-sha1 = "a86af9c4c4f33e16a2b2ff43c2113b2f390081fa"
 uuid = "85a47980-9c8c-11e8-2b9f-f7ca1fa99fb4"
-version = "0.4.4"
+version = "0.4.5"
 
 [[deps.Distances]]
 deps = ["LinearAlgebra", "Statistics", "StatsAPI"]
@@ -171,7 +171,7 @@ version = "0.1.2"
 
 [[deps.FullShell]]
 deps = ["Parameters", "Quantica", "Roots"]
-git-tree-sha1 = "9541acebb2b3c9ede10a715f0c2ea6ad8d03f31b"
+git-tree-sha1 = "d310197bf2412f11bed38f22c928d356d3c50e30"
 repo-rev = "main"
 repo-url = "git@github.com:CarlosP24/FullShell.jl.git"
 uuid = "7d6ffa35-d0d1-47cf-a89d-5cba1c019934"
@@ -371,9 +371,9 @@ version = "1.11.0"
 
 [[deps.ProgressMeter]]
 deps = ["Distributed", "Printf"]
-git-tree-sha1 = "8f6bc219586aef8baf0ff9a5fe16ee9c70cb65e4"
+git-tree-sha1 = "13c5103482a8ed1536a54c08d0e742ae3dca2d42"
 uuid = "92933f4c-e287-5a05-a399-4b506db050ca"
-version = "1.10.2"
+version = "1.10.4"
 
 [[deps.QuadGK]]
 deps = ["DataStructures", "LinearAlgebra"]

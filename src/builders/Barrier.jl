@@ -9,13 +9,18 @@ function lorentzian(x::Float64, x0::Float64, σ::Float64)
     return γ^2 / d
 end
 
-function barrier(params::Barrier_params)
+function barrier_v2(params::Barrier_params)
     @unpack LB, VB = params
     σ = LB/4
     z0 = 6 * σ
     LC = 12 * σ
     V(z) = VB * lorentzian(z, z0, σ)
     return V, LC
+end
+
+function barrier_v1(params::Barrier_params)
+    @unpack LB, VB = params
+    return z -> VB * exp(-25 * (z - LB/2)^2/LB^2), LB
 end
 
 function build_SC(wire::Params, L::Float64)
@@ -37,7 +42,7 @@ function build_SC(wire::Params, L::Float64)
     return ΣS!
 end
 
-function build_barrier(h::Quantica.AbstractHamiltonian1D, wire::Params, barrier_params::Barrier_params)
+function build_barrier_v2(h::Quantica.AbstractHamiltonian1D, wire::Params, barrier_params::Barrier_params)
     @unpack R, w, a0 = wire
     @unpack LB = barrier_params
     V, LC = barrier(barrier_params)
@@ -53,6 +58,24 @@ function build_barrier(h::Quantica.AbstractHamiltonian1D, wire::Params, barrier_
     # Add barrier and SC
     ΣS! = build_SC(wire, 2 * LB)
     hCS = hC |> ΣS! |> V!
+
+    return hCS, LC
+end
+
+function build_barrier_v1(h::Quantica.AbstractHamiltonian1D, wire::Params, barrier_params::Barrier_params)
+    @unpack R, w, a0 = wire
+    @unpack LB = barrier_params
+    V, LC = barrier_v1(barrier_params)
+
+    # Onsite modifier
+    V! = @onsite!((o, r;) -> 
+        o + V(r[1]) * σ0τz;
+    )
+
+    # Central region
+    hC = h |> supercell(region = r -> 0 <= r[1] <= LC)
+
+    hCS = hC |> V!
 
     return hCS, LC
 end

@@ -1,11 +1,11 @@
 using Pkg
 Pkg.activate("plots")
 Pkg.instantiate()
-using CairoMakie, Parameters, JLD2, Quantica, FullShell
+using CairoMakie, Parameters, JLD2, Quantica, FullShell, CSV, Tables
 
 ##
 
-function plot_LDOS(pos, name::String; basename = "LDOS", colorrange = (0, 2e-2), vlines = [0, 1, 2])
+function plot_LDOS(pos, name::String; basename = "LDOS", colorrange = (0, 3e-3), vlines = [0, 1, 2])
     res = load("data/$(basename)/$(name).jld2", "res")
     @unpack wire, LDOS, params = res
     @unpack Brng, ωrng = params
@@ -16,12 +16,21 @@ function plot_LDOS(pos, name::String; basename = "LDOS", colorrange = (0, 2e-2),
     ωrng = ωrng |> real
     LDOS = LDOS |> values |> sum .|> abs
     #LDOS = hcat(LDOS, reverse(LDOS, dims = 2)[:, 2:end])
-    heatmap!(ax, Brng, ωrng, LDOS; colormap = :thermal, colorrange)
+    heatmap!(ax, Brng, ωrng, LDOS; colormap = :thermal, colorrange, rasterize = 5)
     ΦtoB = get_B(wire)
     vlines!(ax, ΦtoB.(vlines); color = :white, linestyle = :dash)
 
     return ax 
 end
+
+function export_LDOS(name::String; basename = "LDOS")
+    res = load("data/$(basename)/$(name).jld2", "res")
+    @unpack LDOS = res
+    LDOS = LDOS |> values |> sum .|> abs
+    CSV.write("data/$(basename)/$(name)_LDOS.csv", Tables.table(LDOS), writeheader=false)
+end
+
+
 
 function plot_conductance(pos, name::String; basename = "Conductance", colorrange = (0, 1), vlines = [1, 2])
     res = load("data/$(basename)/$(name).jld2", "res")
@@ -33,7 +42,7 @@ function plot_conductance(pos, name::String; basename = "Conductance", colorrang
     ωrng = ωrng |> real
     G = G |> values |> sum .|> abs
     #G = hcat(G, reverse(G, dims = 2)[:, 2:end])
-    heatmap!(ax, Brng, ωrng, G; colormap = :thermal, colorrange)
+    heatmap!(ax, Brng, ωrng, G; colormap = :thermal, colorrange, rasterize = 5)
 
     ΦtoB = get_B(wire)
     vlines!(ax, ΦtoB.(vlines); color = :white, linestyle = :dash)
@@ -42,6 +51,13 @@ function plot_conductance(pos, name::String; basename = "Conductance", colorrang
 
 
     return ax 
+end
+
+function export_conductance(name::String; basename = "Conductance")
+    res = load("data/$(basename)/$(name).jld2", "res")
+    @unpack G = res
+    G = G |> values |> sum .|> abs
+    CSV.write("data/$(basename)/$(name)_Conductance.csv", Tables.table(G), writeheader=false)
 end
 
 function find_B(B, Brng)
@@ -102,3 +118,7 @@ function plot_proposal()
 end
 
 fig = plot_proposal()
+save("plots/figures/2025_04_07_proposal.pdf", fig)
+export_LDOS("dev_1")
+export_conductance("sys_1")
+fig

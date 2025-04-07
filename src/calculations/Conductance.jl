@@ -18,7 +18,7 @@ function calc_Conductance(name::String)
     gN = hSM |> greenfunction(GS.Schur(boundary = 0))
 
     # Central region 
-    hC, LC = build_barrier(hSM, params, barrier_params)
+    hC, LC = build_barrier_v1(hSM, params, barrier_params)
 
     # Build system
     g = hC |> attach(gS; region = r -> r[1] == LC) |> attach(gN; region = r -> r[1] == 0) |> greenfunction()
