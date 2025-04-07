@@ -18,16 +18,22 @@ function plot_LDOS(pos, name::String; basename = "LDOS", colorrange = (0, 3e-3),
     #LDOS = hcat(LDOS, reverse(LDOS, dims = 2)[:, 2:end])
     heatmap!(ax, Brng, ωrng, LDOS; colormap = :thermal, colorrange, rasterize = 5)
     ΦtoB = get_B(wire)
-    vlines!(ax, ΦtoB.(vlines); color = :white, linestyle = :dash)
+    #vlines!(ax, ΦtoB.(vlines); color = :white, linestyle = :dash)
 
     return ax 
 end
 
 function export_LDOS(name::String; basename = "LDOS")
     res = load("data/$(basename)/$(name).jld2", "res")
-    @unpack LDOS = res
+    @unpack LDOS, params, wire = res
+    @unpack Brng, ωrng = params
+    BtoΦ = get_Φ(wire)
+    Φrng = BtoΦ.(Brng)
+    ωrng = ωrng |> real
     LDOS = LDOS |> values |> sum .|> abs
-    CSV.write("data/$(basename)/$(name)_LDOS.csv", Tables.table(LDOS), writeheader=false)
+    CSV.write("data/$(basename)/$(name)_LDOS.csv", Tables.table(Φrng'), writeheader=false)
+    CSV.write("data/$(basename)/$(name)_LDOS.csv", Tables.table(ωrng'), writeheader=false, append = true)
+    CSV.write("data/$(basename)/$(name)_LDOS.csv", Tables.table(LDOS), writeheader=false, append = true)
 end
 
 
@@ -45,7 +51,7 @@ function plot_conductance(pos, name::String; basename = "Conductance", colorrang
     heatmap!(ax, Brng, ωrng, G; colormap = :thermal, colorrange, rasterize = 5)
 
     ΦtoB = get_B(wire)
-    vlines!(ax, ΦtoB.(vlines); color = :white, linestyle = :dash)
+    #vlines!(ax, ΦtoB.(vlines); color = :white, linestyle = :dash)
     text!(ax, 0, 0.02; text = L"$V_B = %$(barrier.VB)$meV", color = :white, fontsize = 12, align = (:center, :center))
     text!(ax, 0, -0.02; text = L"$L_B = %$(barrier.LB)$nm", color = :white, fontsize = 12, align = (:center, :center))
 
@@ -55,9 +61,15 @@ end
 
 function export_conductance(name::String; basename = "Conductance")
     res = load("data/$(basename)/$(name).jld2", "res")
-    @unpack G = res
+    @unpack G, wire, params = res
+    @unpack Brng, ωrng = params
+    BtoΦ = get_Φ(wire)
+    Φrng = BtoΦ.(Brng)
+    ωrng = ωrng |> real
     G = G |> values |> sum .|> abs
-    CSV.write("data/$(basename)/$(name)_Conductance.csv", Tables.table(G), writeheader=false)
+    CSV.write("data/$(basename)/$(name)_Conductance.csv", Tables.table(Φrng'), writeheader=false)
+    CSV.write("data/$(basename)/$(name)_Conductance.csv", Tables.table(ωrng'), writeheader=false, append = true)
+    CSV.write("data/$(basename)/$(name)_Conductance.csv", Tables.table(G), writeheader=false, append = true)
 end
 
 function find_B(B, Brng)
@@ -101,7 +113,7 @@ function plot_proposal()
     hidexdecorations!(ax, ticks = false)
     Colorbar(fig[1, 2], colormap = :thermal, limits = (0, 1), ticks = [0, 1], label = L"$$LDOS (arb. units)", labelpadding = -10)
     ax = plot_conductance(fig[2, 1], "sys_1"; colorrange = (0, 0.5))
-    hlines!(ax, 0; color = :white, linestyle = :dash)
+    #hlines!(ax, 0; color = :white, linestyle = :dash)
     Colorbar(fig[2, 2], colormap = :thermal, limits = (0, 0.5), ticks = [0, 0.4], label = L"$G$ $(e^2/h)$", labelpadding = -20)
 
     fig_cuts = fig[3, 1:2] = GridLayout()
