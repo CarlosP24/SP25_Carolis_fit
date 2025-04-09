@@ -19,3 +19,5 @@ $ julia --project bin/launch_local.jl calc_name
 where `calc_name` is the key to a dictionary in `models/wires.jl` or `models/systems.jl` followed by `ldos` or `cond`. To reproduce the results shown in the manuscript, use  `dev_1_ldos` for the LDOS and `sys_1_cond` for the dI/dV.
 
 Results are stored in `data`. Code in `plots` is used to produce preliminary figures and export data to non-julia formats.
+
+Slurm launching code is available as a standalone template in [slurm_julia_block](https://github.com/CarlosP24/slurm_julia_block).
