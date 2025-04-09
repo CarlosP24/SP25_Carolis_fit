@@ -1,4 +1,7 @@
 # Caroli-de Gennes-Matricon Analogs in Full-Shell Hybrid Nanowires theory model code
+
+[![DOI](https://zenodo.org/badge/956493600.svg)](https://doi.org/10.5281/zenodo.15181152)
+
 Code used to produce the theory figures of the manuscript [Caroli-de Gennes-Matricon Analogs in Full-Shell Hybrid Nanowires](https://arxiv.org/abs/2501.05419).
 
 Based on [Quantica.jl](https://github.com/pablosanjose/Quantica.jl) and [FullShell.jl](https://github.com/CarlosP24/FullShell.jl).
